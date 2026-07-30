@@ -333,9 +333,66 @@ Combining all of these together through a mini bus (mainly just a few wires) her
     
     endmodule
 
-While I wait for my FPGA to arrive for actual testing, I will begin general verification through benchmarking and looking at GTKwave for consistency.
+**Verification**
+
+Since Icarus Verilog has limited SystemVerilog capabilities, I mainly used Verilog for the testbenches as well as GTKWave for visual representation
 
 
+The first testbench I did was making sure the program counter is working properly. Since there is a jump in order for my CPU to do as I intended, I manually checked the expected sequence. While this isn't the best way of checking this, this was the easiest for right now: 
+    
+    `timescale 1ns/1ps
+    
+    module cpu_tb;
+
+    reg clk;
+    reg reset;
+
+    cpu uut (.clk(clk), .reset(reset));
+
+    always #5 clk = ~clk;
+
+    
+       integer i;
+       integer expected_pc [0:9];
+       initial begin
+            expected_pc[0]=0;
+            expected_pc[1]=1;
+            expected_pc[2]=2;
+            expected_pc[3]=3;
+            expected_pc[4]=4;
+            expected_pc[5]=1;
+            expected_pc[6]=2;
+            expected_pc[7]=3;
+            expected_pc[8]=4;
+            expected_pc[9]=1;
+
+        clk = 0;
+        reset = 1;
+
+        $dumpfile("cpu.vcd");
+        $dumpvars(0, cpu_tb);
+
+        #20 reset = 0;
+
+        for(i = 0; i < 10; i=i+1) begin
+            @(posedge clk);
+            if(uut.pc_out != expected_pc[i])
+                $display("FAIL at cycle %d | expected=%0d | actual=50d", i, i, uut.pc_out);
+            else
+                $display("PASS cycle %d", i);
+        end
+
+        $finish;
+    end
+
+
+
+
+
+    endmodule
+
+
+  When I ran the test everything passed which shows that the jump and my ISA is translating correctly over to my PC. In the future I will probably implement and see if the zero flag is up as this is a better way of checking rather than manually entering what I expect.
 
 
   
