@@ -394,6 +394,9 @@ The first testbench I did was making sure the program counter is working properl
 
   When I ran the test everything passed which shows that the jump and my ISA is translating correctly over to my PC. In the future I will probably implement and see if the zero flag is up as this is a better way of checking rather than manually entering what I expect.
 
+
+  **ALU Verification**
+
 Now I've implemented a ALU testbench to verify that my ALU outputted the correct values based on the opcode given: either ADD, SUB, COMP, or XOR. I did this by utilizing nested for loops to test every possible combination and see if there was error:
 
     `timescale 1ns/1ps
