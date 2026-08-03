@@ -397,7 +397,7 @@ The first testbench I did was making sure the program counter is working properl
 
   **ALU Verification**
 
-Now I've implemented a ALU testbench to verify that my ALU outputted the correct values based on the opcode given: either ADD, SUB, COMP, or XOR. I did this by utilizing nested for loops to test every possible combination and see if there was error:
+Now I've implemented a ALU testbench to verify that my ALU outputs the correct values based on the opcode given: either ADD, SUB, COMP, or XOR. I did this by utilizing nested for loops to test every possible combination and see if there was error:
 
     `timescale 1ns/1ps
     
@@ -475,7 +475,12 @@ Now I've implemented a ALU testbench to verify that my ALU outputted the correct
     
     endmodule
 
-Running this test using my ALU module all tests passed which verifies my ALU's functionality.
+Running this test using my ALU module shows the following: 
+
+    VCD info: dumpfile alu.vcd opened for output.
+    alu_tb.sv:71: $finish called at 20480000 (1ps)
+
+Since no error messages were displayed and the finish was called at the proper time needed for all 1024 tests, this has verified that my ALU works the way it's intended.
 
 
 
