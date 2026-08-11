@@ -483,8 +483,196 @@ Running this test using my ALU module shows the following:
 Since no error messages were displayed and the finish was called at the proper time needed for all 1024 tests, this has verified that my ALU works the way it's intended.
 
 
+**General CPU Testbench**
 
+Now I'm testing to see if the CPU functions the way I want it to. Since I want my CPU to count from 1 to 10 in a loop, I'll test 30 separate clock cycles and see how my register, PC, and instructions relate and if it's counting as expected:
+
+
+    `timescale 1ns/1ps
+
+    module cpu_tb;
+
+        reg clk;
+        reg reset;
+    
+        cpu uut (.clk(clk), .reset(reset));
+    
+        always #5 clk = ~clk;
+    
+    
+       
+        initial begin
+    
+        clk = 0;
+        reset = 1;
+    
+        #10;
+        reset = 0;
+    
+        repeat (30) begin
+            @(posedge clk);
+            #1;
+    
+            $display("PC = %0d | instr = %b | R0 = %0d | zero = %b", uut.pc_out, uut.instr, uut.r0, uut.zero_flag);
+        end
+    
+        $finish;
+    
+        end
+
+
+
+
+
+    endmodule
+
+
+Compiling this outputs the following
+
+    PC = 1 | instr = 00000010 | R0 = 1 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 2 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 2 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 2 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 2 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 3 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 3 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 3 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 3 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 4 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 4 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 4 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 4 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 5 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 5 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 5 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 5 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 6 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 6 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 6 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 6 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 7 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 7 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 7 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 7 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 8 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 8 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 8 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 8 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 9 | zero = 0
+
+This seems to be working properly. The PC is jumping back as intended and the register is incrementing when the add instruction is in the clock cycle. I went ahead and went up to 50 clock cycles to see if it actually goes to 10 and then loops back to 0. This was just done at this line here:
+
+    repeat (30) begin
+
+Just changing it to 50 outputs the following(here I'll just show the last 20 since we've seen the first 30 above): 
+
+    PC = 3 | instr = 01101010 | R0 = 9 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 9 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 9 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 10 | zero = 1
+    PC = 3 | instr = 01101010 | R0 = 10 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 10 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 10 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 11 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 11 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 11 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 11 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 12 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 12 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 12 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 12 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 13 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 13 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 13 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 13 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 14 | zero = 0
+
+  There is now an error as the register did not go back to 0 and just continued incrementing even with the zero flag up as seen in the output. I can see though that the PC never actually goes to instruction 5 so this may be an issue in the control unit.
+
+
+Looking at my CU, it seems to be an issue with the opcodes. The defaults I have set are: 
+
+    always@(*)
+    begin
+        reg_write = 0;
+        alu_src = 0;
+        alu_op = 2'b00;
+        jump = 0;
+        jump_cond = 0;
+
+    ...
+    3'b011 : begin //jeq
+        jump = 1;
+        jump_cond = 1;
+    
+
+But the issue with this is that my ADD opcode is 2'b00. Since this is the default, and there is no alu operation change in my jump if equal opcode, by default it increments. This then lowers that zero flag and the register never goes back to zero. Changing this so that the ALU compares when the JEQ opcode is on instead of the default increment yields this:
+
+    3'b011 : begin //jeq
+        alu_op = 2'b10
+        alu_src = 1;
+        jump = 1;
+        jump_cond = 1;
+
+
+  Recompiling this updated CPU with proper control logic, I get the following output:
+
+
+    PC = 1 | instr = 00000010 | R0 = 1 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 2 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 2 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 2 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 2 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 3 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 3 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 3 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 3 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 4 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 4 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 4 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 4 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 5 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 5 | zero = 1
+    PC = 5 | instr = 10000000 | R0 = 5 | zero = 0
+    PC = 6 | instr = 01000010 | R0 = 5 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 5 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 6 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 6 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 6 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 6 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 7 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 7 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 7 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 7 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 8 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 8 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 8 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 8 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 9 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 9 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 9 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 9 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 10 | zero = 1
+    PC = 3 | instr = 01101010 | R0 = 10 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 10 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 10 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 11 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 11 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 11 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 11 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 12 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 12 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 12 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 12 | zero = 0
+    PC = 2 | instr = 00110100 | R0 = 13 | zero = 0
+    PC = 3 | instr = 01101010 | R0 = 13 | zero = 0
+    PC = 4 | instr = 01000010 | R0 = 13 | zero = 0
+    PC = 1 | instr = 00000010 | R0 = 13 | zero = 0
+
+  The register is still not looping properly and the zero flag is up when the register is 5. This seems to be an issue with my IM. Also, my zero flag is purely combinational as I've just assigned it to be on when the output is 0. I'll begin to implement it within my cpu as a register itself rather than just be combinational.
   
+      
+      
 
 
   
