@@ -670,9 +670,118 @@ But the issue with this is that my ADD opcode is 2'b00. Since this is the defaul
     PC = 1 | instr = 00000010 | R0 = 13 | zero = 0
 
   The register is still not looping properly and the zero flag is up when the register is 5. This seems to be an issue with my IM. Also, my zero flag is purely combinational as I've just assigned it to be on when the output is 0. I'll begin to implement it within my cpu as a register itself rather than just be combinational.
-  
-      
-      
+
+
+Another issue is also that my ALU doesn't have a specific opcode for immediately loading a specific value into the register, and since the default opcode in my control unit is to ADD it's doing 10 + 0 which keeps my register value at 10.
+
+I went ahead and made a register specifically for the zero flag called comp_zero:
+
+    always @(posedge clk) begin
+        if (reset)
+            comp_zero <= 1'b0;
+        else if (opcode == 3'b001) 
+            comp_zero <= zero_flag;
+    end
+This checks to see if zero flag should be up when the COMP instruction is being used. 
+
+
+To solve the issue with my ALU, I went ahead and gave it a 3 bit opcode instead of 2 so that it matches with my ISA and makes it easier to cater specific functions to it from the instruction set:
+
+    always@(*)
+    begin
+        case(opcode)
+        3'b000 : begin
+            y = sum; //add
+            cout = carry;
+        end
+        3'b001 : begin
+            y = sum; //subtract
+            cout = ~carry;
+        end
+        3'b010 : begin
+            y = (a < b) ? 4'b0001 : (a > b) ? 4'b0010 : 0; //COMP
+            cout = 0;
+        end
+        3'b011 : begin
+            y = a ^ b; //xor since i can't do much else
+            cout = 0;
+        end
+        3'b100 : begin
+            y = b; //LI
+            cout = 0;
+        end
+        default: begin
+            y = 4'b0000; //default: just sets both to 0
+            cout = 1'b0;
+        end
+        endcase
+    end
+
+
+Editing this and adding the comp_zero into the testbench I get the following output: 
+
+
+    PC = 1 | instr = 00000010 | R0 = 1 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 4 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 4 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 4 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 4 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 5 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 5 | ALU_zero = 1 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 5 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 5 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 6 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 6 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 6 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 6 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 7 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 7 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 7 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 7 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 8 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 8 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 8 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 8 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 9 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 9 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 9 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 9 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 10 | ALU_zero = 1 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 10 | ALU_zero = 0 | comp_zero = 1
+    PC = 5 | instr = 10000000 | R0 = 10 | ALU_zero = 1 | comp_zero = 1
+    PC = 6 | instr = 01000010 | R0 = 0 | ALU_zero = 1 | comp_zero = 1
+    PC = 1 | instr = 00000010 | R0 = 0 | ALU_zero = 0 | comp_zero = 1
+    PC = 2 | instr = 00110100 | R0 = 1 | ALU_zero = 0 | comp_zero = 1
+    PC = 3 | instr = 01101010 | R0 = 1 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 1 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 1 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 2 | ALU_zero = 0 | comp_zero = 0
+    PC = 2 | instr = 00110100 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+    PC = 3 | instr = 01101010 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+    PC = 4 | instr = 01000010 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+    PC = 1 | instr = 00000010 | R0 = 3 | ALU_zero = 0 | comp_zero = 0
+
+The register is now looping properly and the general functionality of this CPU is correct overall. 
+
+
+The next major step I will be taking is to pipeline this CPU with a 5 stage pipeline.
+
+
+
+
+
+          
 
 
   
