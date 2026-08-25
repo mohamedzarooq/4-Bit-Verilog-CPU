@@ -36,4 +36,4 @@ For this, I decided to make a small, but usable ISA for this that I've listed be
 
 
 For this CPU, there are 5 different modules/parts needed to make this work: The ALU(Arithmetic Logic Unit), CU(Control Unit), IM(Instruction Memory), PC(Program Counter), and registers.
-Here's each of those verilog codes listed down below:
+
