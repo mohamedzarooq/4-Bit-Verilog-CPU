@@ -19,11 +19,11 @@
         #10;
         reset = 0;
     
-        repeat (50) begin
+        repeat (80) begin
             @(posedge clk);
             #1;
     
-            $display("PC = %0d | instr = %b | R0 = %0d | zero_flag = %b | zero_comp = %b", uut.pc_out, uut.instr, uut.r0, uut.zero_flag, uut.comp_zero);
+            $display("PC = %0d | instr = %b | R0 = %0d | zero_flag = %b", uut.pc_out, uut.instr, uut.r0, uut.zero_flag);
         end
     
         $finish;

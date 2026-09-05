@@ -25,8 +25,8 @@ module alu(input [3:0] a, input [3:0] b, input [2:0] opcode,
     wire cin_internal;
     wire carry;
     
-    assign cin_internal = (opcode == 2'b01); //if opcode is 1 assigns to 1, if not, assigns to 0
-    assign b_mod = (opcode == 2'b01) ? ~b : b;
+    assign cin_internal = (opcode == 3'b001); //if opcode is 1 assigns to 1, if not, assigns to 0
+    assign b_mod = (opcode == 3'b001) ? ~b : b;
     assign zero_f = (y == 0);
     assign neg_f = y[3];
     assign eq_f = (a == b);
@@ -35,8 +35,7 @@ module alu(input [3:0] a, input [3:0] b, input [2:0] opcode,
     ripple_4bitadder unit (.a(a), .b(b_mod), .cin(cin_internal), .s(sum), .cout(carry));
     
     
-     always@(*)
-    begin
+    always@(*) begin
         case(opcode)
         3'b000 : begin
             y = sum; //add
@@ -47,7 +46,7 @@ module alu(input [3:0] a, input [3:0] b, input [2:0] opcode,
             cout = ~carry;
         end
         3'b010 : begin
-            y = (a < b) ? 4'b0001 : (a > b) ? 4'b0010 : 0; //COMP
+            y = eq_f; //comp
             cout = 0;
         end
         3'b011 : begin
@@ -69,8 +68,7 @@ module alu(input [3:0] a, input [3:0] b, input [2:0] opcode,
 module control_unit(input [2:0] opcode, output reg reg_write, 
     output reg [2:0] alu_op, output reg alu_src, 
     output reg  jump, output reg jump_cond);
-    always@(*)
-    begin
+    always@(*) begin
         reg_write = 0;
         alu_src = 0;
         alu_op = 3'b000;
@@ -121,7 +119,7 @@ module instruction_memory(input [3:0] addr, output reg [7:0] instr);
 
     case(addr) 
                       //What the values of the address mean: ###(ISA)_####(value)_#(register)
-        4'b0000 : instr = 8'b100_0001_0; //li 1 to r0
+        4'b0000 : instr = 8'b100_0000_0; //li 1 to r0
         4'b0001 : instr = 8'b000_0001_0; //add 1 to r0 i.e r0 = r0 + 1
         4'b0010 : instr = 8'b001_1010_0; //compare r0 to 10
         4'b0011 : instr = 8'b011_0101_0; //jeq to instruction 5(reset)
@@ -135,14 +133,14 @@ module instruction_memory(input [3:0] addr, output reg [7:0] instr);
 
     endmodule
 
-module program_counter(input clk, input reset, input jump, input jump_cond, input [3:0] jump_add, input count_en, input zero_flag, output reg [3:0] pc_out);
+module program_counter(input clk, input reset, input jump, input jump_cond, input [3:0] jump_add, input count_en, input eq_flag, output reg [3:0] pc_out);
 
       wire [3:0] next_pc;
       wire [3:0] increment;
       wire pc_takejump;
 
       assign increment = pc_out + 1;
-      assign pc_takejump = jump & (jump_cond ? zero_flag : 1'b1); //for jeq in isa
+      assign pc_takejump = jump & (jump_cond ? eq_flag : 1'b1); //for jeq in isa
       assign next_pc = pc_takejump ? jump_add : increment; //jump to new address if enabled
         
     
@@ -197,7 +195,7 @@ module cpu(input wire clk, input wire reset);
     
     wire [3:0] pc_out;
     wire [7:0] instr;
-    reg comp_zero;
+    reg comp_val;
     
     program_counter PC (
         .clk(clk),
@@ -206,7 +204,7 @@ module cpu(input wire clk, input wire reset);
         .jump_cond(jump_cond),
         .jump_add(instr[4:1]),
         .count_en(1'b1),
-        .zero_flag(comp_zero),
+        .eq_flag(comp_val),
         .pc_out(pc_out)
     );
     
@@ -266,9 +264,9 @@ module cpu(input wire clk, input wire reset);
 
     always @(posedge clk) begin
         if (reset)
-            comp_zero <= 1'b0;
+            comp_val <= 1'b0;
         else if (opcode == 3'b001) 
-            comp_zero <= zero_flag;
+            comp_val <= eq_flag;
     end
      
     

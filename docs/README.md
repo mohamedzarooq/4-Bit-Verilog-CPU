@@ -11,7 +11,7 @@ For this, I decided to make a small, but usable ISA for this that I've listed be
 
   
   - 000: ADD //R0 = R0 + R1
-  - 001: COMP //compare R0 to R1, flags
+  - 001: COMP //compare R0 to 10, flags
   - 010: JMP //jump, PC = address
   - 011: JEQ //jump if equal flag is up
   - 100: LI //load immediate (loads a specific value directly into the register, hence the immediate)
