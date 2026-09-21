@@ -42,17 +42,17 @@ For this CPU, there are 5 different modules/parts needed to make this work: The 
 **HOW TO RUN** 
 
 1. Download Icarus Verilog:
-    I used Icarus to write all my code. Here's a guide to install: https://steveicarus.github.io/iverilog/usage/installation.html
+      I used Icarus to write all my code. Here's a guide to install: https://steveicarus.github.io/iverilog/usage/installation.html
 
 2. Clone the repo: 
-      git clone git@github.com:mohamedzarooq/4-Bit-Verilog-CPU.git
+      `git clone git@github.com:mohamedzarooq/4-Bit-Verilog-CPU.git`
 
 
 3. Compile code(I added all modules in cpu file to make it easier):
-      iverilog -o cpu_sim.vvp cpu.v cpu_tb.v
+      `iverilog -o cpu_sim.vvp cpu.v cpu_tb.v`
 
 4. Run the VVP file:
-      vvp cpu_sim.vvp
+      `vvp cpu_sim.vvp`
 
 5. To use waveform run GTKWave(This will also need to be installed):
-      gtkwave
+      `gtkwave`
