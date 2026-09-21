@@ -19,7 +19,7 @@
         #10;
         reset = 0;
     
-        repeat (50) begin
+        repeat (100) begin
             @(posedge clk);
             #1;
     
