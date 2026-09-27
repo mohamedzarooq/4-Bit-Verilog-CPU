@@ -37,7 +37,25 @@ For this, I decided to make a small, but usable ISA for this that I've listed be
 
 For this CPU, there are 5 different modules/parts needed to make this work: The ALU(Arithmetic Logic Unit), CU(Control Unit), IM(Instruction Memory), PC(Program Counter), and registers.
 
+The main program I'm using is 'programs.mem'
 
+      Here is that and what each instruction does:
+            10000000 //li 0 to r0
+            00000010 //add 1 to r0 i.e r0 = r0 + 1
+            00110100 //compare r0 to 10
+            01101010 //jeq to instruction 5(reset)
+            01000010 //jmp to instruction 1(loop)
+            10000000 //li 0 to r0
+            01000010 //jmp to instruction 1(loop)
+            00000000 //program has ended, so auto to default instruction
+            00000000
+            00000000
+            00000000
+            00000000
+            00000000
+            00000000
+            00000000
+            
 
 **HOW TO RUN** 
 
