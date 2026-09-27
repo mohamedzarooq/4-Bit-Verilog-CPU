@@ -21,6 +21,7 @@
     
 
         repeat (100) begin            
+                @(posedge clk);
                 #1;
     
                 $display("PC = %0d | instr = %b | R0 = %0d | zero_flag = %b", uut.pc_out, uut.instr, uut.r0, uut.zero_flag);

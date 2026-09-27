@@ -14,7 +14,7 @@ module ripple_4bitadder(input [3:0] a, input [3:0] b, input cin, output [3:0] s,
     fulladder fa2 (.a(a[2]), .b(b[2]), .cin(c2), .s(s[2]), .cout(c3));
     fulladder fa3 (.a(a[3]), .b(b[3]), .cin(c3), .s(s[3]), .cout(cout));
     
-    endmodule
+endmodule
     
 module alu(input [3:0] a, input [3:0] b, input [2:0] opcode, 
     output reg cout, output reg [3:0] y, output zero_f, output neg_f, output eq_f);
@@ -27,7 +27,7 @@ module alu(input [3:0] a, input [3:0] b, input [2:0] opcode,
     
     assign cin_internal = (opcode == 3'b001); //if opcode is 1 assigns to 1, if not, assigns to 0
     assign b_mod = (opcode == 3'b001) ? ~b : b;
-    assign zero_f = (y == 0);
+    assign zero_f = (a == 0);
     assign neg_f = y[3];
     assign eq_f = (a == b);
     
@@ -63,7 +63,7 @@ module alu(input [3:0] a, input [3:0] b, input [2:0] opcode,
         end
         endcase
     end
-    endmodule
+endmodule
 
 module control_unit(input [2:0] opcode, output reg reg_write, 
     output reg [2:0] alu_op, output reg alu_src, 
@@ -110,28 +110,27 @@ module control_unit(input [2:0] opcode, output reg reg_write,
     
     
     
-    endmodule
+endmodule
 
-module instruction_memory(input [3:0] addr, output reg [7:0] instr);
+module instruction_memory(input [3:0] addr, output [7:0] instr);
 
-    always @(*) begin
-      //count from 0 to 10. i need to increment, store, and output, then loop back to 0 once at 10. ADD(00), LOAD(10), STORE(01), JUMP(11)
-
-    case(addr) 
-                      //What the values of the address mean: ###(ISA)_####(value)_#(register)
-        4'b0000 : instr = 8'b100_0000_0; //li 0 to r0
-        4'b0001 : instr = 8'b000_0001_0; //add 1 to r0 i.e r0 = r0 + 1
-        4'b0010 : instr = 8'b001_1010_0; //compare r0 to 10
-        4'b0011 : instr = 8'b011_0101_0; //jeq to instruction 5(reset)
-        4'b0100 : instr = 8'b010_0001_0; //jmp to instruction 1(loop)
-        4'b0101 : instr = 8'b100_0000_0; //li 0 to r0
-        4'b0110 : instr = 8'b010_0001_0; //jmp to instruction 1(loop)
-        default : instr = 8'b000_0000_0;
-    endcase
+    reg [7:0] memory [0:15];
+    integer i;
+    
+    initial begin
+        for(i = 0; i < 16; i = i + 1) begin
+            memory[i] = 8'b00000000;
+        end
+        $display("Loading instruction memory...");
+        $readmemb("src/programs.mem", memory, 0, 6);
     end
 
+    assign instr = memory[addr];
 
-    endmodule
+
+
+
+endmodule
 
 module program_counter(input clk, input reset, input jump, input jump_cond, input [3:0] jump_add, input count_en, input eq_flag, output reg [3:0] pc_out);
 
