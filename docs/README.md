@@ -1,5 +1,5 @@
 # 4-Bit-Verilog-CPU
-A simple 4 bit cpu that I made in verilog that has it's own custom ISA catered to count from 0 to 10 in a loop
+A simple 4 bit cpu that I made in verilog that has it's own custom ISA
 
 Over the summer I've taken the time to make this with no experience with computer architecture. With the help of AI and Ben Eater(shout out to the goat). 
 I made this pretty simple CPU that counts from 1 to 10 in a loop.
@@ -37,7 +37,7 @@ For this, I decided to make a small, but usable ISA for this that I've listed be
 
 For this CPU, there are 5 different modules/parts needed to make this work: The ALU(Arithmetic Logic Unit), CU(Control Unit), IM(Instruction Memory), PC(Program Counter), and registers.
 
-The main program I'm using is 'programs.mem'
+The main program I'm using is 'programs.mem'. This converts the instructions above into binary:
 
       Here is that and what each instruction does:
             10000000 //li 0 to r0
