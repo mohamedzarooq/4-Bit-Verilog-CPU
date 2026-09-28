@@ -10,11 +10,11 @@ I made this pretty simple CPU that counts from 1 to 10 in a loop.
 For this, I decided to make a small, but usable ISA for this that I've listed below along with the assembly code the CPU needs:
 
   
-  - 000: ADD //R0 = R0 + R1
-  - 001: COMP //compare R0 to R1, flags
-  - 010: JMP //jump, PC = address
-  - 011: JEQ //jump if equal flag is up
-  - 100: LI //load immediate (loads a specific value directly into the register, hence the immediate)
+  - 000: ADD (R0 = R0 + R1)
+  - 001: COMP (compare R0 to R1, uses flags)
+  - 010: JMP (jump, PC = address)
+  - 011: JEQ (jump if equal flag is up)
+  - 100: LI (load immediate (loads a specific value directly into the register, hence the immediate))
 
 
   This 3 bit ISA was enough to count in a loop properly
