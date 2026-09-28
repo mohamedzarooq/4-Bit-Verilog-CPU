@@ -139,7 +139,7 @@ module program_counter(input clk, input reset, input jump, input jump_cond, inpu
       wire pc_takejump;
 
       assign increment = pc_out + 1;
-      assign pc_takejump = jump & (jump_cond ? eq_flag : 1'b1); //for jeq in isa
+      assign pc_takejump = jump & (jump_cond ? eq_flag : 1'b1); //for jeq in isa  
       assign next_pc = pc_takejump ? jump_add : increment; //jump to new address if enabled
         
     
