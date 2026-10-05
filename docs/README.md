@@ -2,7 +2,7 @@
 A simple 4 bit cpu that I made in verilog that has it's own custom ISA
 
 Over the summer I've taken the time to make this with no experience with computer architecture. With the help of AI and Ben Eater(shout out to the goat). 
-I made this pretty simple CPU that counts from 1 to 10 in a loop.
+I made this pretty simple CPU and verified it with a program that makes it count from 1 to 10 in a loop.
 
 **CUSTOM ISA**
 
