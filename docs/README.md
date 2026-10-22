@@ -1,4 +1,4 @@
-# 4-Bit-Verilog-CPU
+# 4-Bit-Single-Cycle-CPU
 A simple 4 bit cpu that I made in verilog that has it's own custom ISA
 
 Over the summer I've taken the time to make this with no experience with computer architecture. With the help of AI and Ben Eater(shout out to the goat). 
